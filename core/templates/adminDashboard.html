@@ -1,0 +1,19 @@
+<h2>Admin Dashboard</h2>
+
+<div>
+    <p><strong>Total Customers:</strong> {{ total_customers }}</p>
+    <p><strong>Total Service Providers:</strong> {{ total_providers }}</p>
+    <p><strong>Pending Provider Approvals:</strong> {{ pending_providers }}</p>
+    <p><strong>Total Orders:</strong> {{ total_orders }}</p>
+    <p><strong>Pending Custom Package Requests:</strong> {{ pending_custom_requests }}</p>
+</div>
+
+<hr>
+
+<a href="{% url 'adminProviders' %}">Manage Service Providers</a><br>
+<a href="{% url 'adminCategories' %}">Manage Categories</a><br>
+<a href="{% url 'adminPackages' %}">Manage Packages</a><br>
+<a href="{% url 'adminVenues' %}">Manage Venues</a><br>
+<a href="{% url 'adminCustomRequests' %}">Manage Custom Requests</a><br>
+<a href="{% url 'adminOrders' %}">Manage Orders</a><br>
+<a href="{% url 'logout' %}">Logout</a>

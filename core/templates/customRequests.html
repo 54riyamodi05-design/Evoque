@@ -1,0 +1,23 @@
+<h2>My Custom Package Requests</h2>
+
+{% if requests %}
+    <table border="1">
+        <tr>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Status</th>
+        </tr>
+
+        {% for r in requests %}
+        <tr>
+            <td>{{ r.title }}</td>
+            <td>{{ r.category.name }}</td>
+            <td>{{ r.description }}</td>
+            <td>{{ r.status }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No custom package requests yet.</p>
+{% endif %}

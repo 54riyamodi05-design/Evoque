@@ -1,0 +1,27 @@
+<h2>Custom Package Requests</h2>
+
+{% if requests %}
+    <table border="1">
+        <tr>
+            <th>Customer</th>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+
+        {% for r in requests %}
+        <tr>
+            <td>{{ r.customer.username }}</td>
+            <td>{{ r.title }}</td>
+            <td>{{ r.category.name }}</td>
+            <td>{{ r.status }}</td>
+            <td><a href="{% url 'adminCustomRequestDetail' r.id %}">View</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No custom requests yet.</p>
+{% endif %}
+
+<p><a href="{% url 'adminDashboard' %}">Back to Dashboard</a></p>

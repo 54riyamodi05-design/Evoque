@@ -1,0 +1,10 @@
+<h2>Packages</h2>
+
+{% for p in packages %}
+    <div>
+        <h3>{{ p.name }}</h3>
+        <p>{{ p.description }}</p>
+        <p>Base Price: ₹{{ p.price }}</p>
+        <a href="{%url 'packageDetail' p.id%}">View Details</a>
+    </div>
+{% endfor %}

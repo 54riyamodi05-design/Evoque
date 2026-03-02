@@ -1,0 +1,40 @@
+<h2>My Orders</h2>
+
+{% if orders %}
+    <table border="1">
+        <tr>
+            <th>Package</th>
+            <th>Theme</th>
+            <th>Status</th>
+            <th>Final Price</th>
+            <th>Payment Method</th>
+            <th>Payment Status</th>
+            <th>Details</th>
+            <th>Cancel</th>
+        </tr>
+
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.package.name }}</td>
+            <td>{{ order.theme_type }}</td>
+            <td>{{ order.status }}</td>
+            <td>₹{{ order.payment.amount }}</td>
+            <td>{{ order.payment.payment_method }}</td>
+            <td>{{ order.payment.status }}</td>
+            <td><a href="{% url 'orderDetail' order.id %}">View</a></td>
+            <td>
+                {% if order.status == 'PENDING' %}
+                    <form method="post" action="{% url 'cancelOrder' order.id %}">
+                        {% csrf_token %}
+                        <button type="submit">Cancel</button>
+                    </form>
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No orders placed yet.</p>
+{% endif %}

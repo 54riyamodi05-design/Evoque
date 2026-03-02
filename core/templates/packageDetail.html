@@ -1,0 +1,35 @@
+<h2>{{ package.name }}</h2>
+<p>{{ package.description }}</p>
+<p>Base Price: ₹{{ package.price }}</p>
+
+<form method="post" action="{% url 'createOrder' package.id %}">
+    {% csrf_token %}
+    <label>Select Theme:</label>
+    <select name="theme_type">
+        <option value="CLASSIC">Classic</option>
+        <option value="MODERATE">Moderate</option>
+        <option value="SUPREME">Supreme</option>
+    </select>
+
+    <label>Select Venue:</label>
+    {% for venue in venues %}
+    <div style="border:1px solid #ccc; padding:10px; margin-bottom:15px;">
+
+        <h4>{{ venue.name }}</h4>
+
+        {% if venue.image %}
+        <img src="{{ venue.image.url }}" width="250">
+        {% else %}
+        <p>No image available</p>
+        {% endif %}
+
+        <p>Price: ₹{{ venue.price }}</p>
+        <p>Capacity: {{ venue.capacity }}</p>
+
+        <input type="radio" name="venue_id" value="{{ venue.id }}">
+
+    </div>
+    {% endfor %}
+
+    <button type="submit">Book Now</button>
+</form>

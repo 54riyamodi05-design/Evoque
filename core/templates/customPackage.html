@@ -1,0 +1,15 @@
+<form method="post">
+    {% csrf_token %}
+
+    <select name="category" required>
+        {% for c in categories %}
+        <option value="{{ c.id }}">{{ c.name }}</option>
+        {% endfor %}
+    </select>
+
+    <input name="title" placeholder="Custom Package Title" required>
+    <textarea name="description" placeholder="Describe your event" required></textarea>
+    <input name="budget" placeholder="Expected Budget (optional)">
+
+    <button type="submit">Submit Request</button>
+</form>

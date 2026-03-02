@@ -1,0 +1,61 @@
+<h2>Venue Management</h2>
+
+<h3>Add Venue</h3>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="text" name="name" placeholder="Venue name" required>
+    <br>
+    <textarea name="address" placeholder="Address" required></textarea>
+    <br>
+    <input type="number" name="capacity" min="1" placeholder="Capacity" required>
+    <br>
+    <input type="number" name="price" step="0.01" min="0" placeholder="Venue price" required>
+    <br>
+    <input type="file" name="image" required>
+    <label>
+        <input type="checkbox" name="status" checked>
+        Active
+    </label>
+    <br>
+    <button type="submit">Add Venue</button>
+</form>
+
+<hr>
+
+<h3>Existing Venues</h3>
+{% if venues %}
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Capacity</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        {% for venue in venues %}
+        <tr>
+            <td>{{ venue.name }}</td>
+            <td>{{ venue.address }}</td>
+            <td>{{ venue.capacity }}</td>
+            <td>₹{{ venue.price }}</td>
+            <td>{% if venue.status %}Active{% else %}Inactive{% endif %}</td>
+            <td>
+                <a href="{% url 'adminVenueEdit' venue.id %}">Edit</a>
+                <form method="post" action="{% url 'adminVenueToggle' venue.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    {% if venue.status %}
+                        <button type="submit">Deactivate</button>
+                    {% else %}
+                        <button type="submit">Activate</button>
+                    {% endif %}
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No venues yet.</p>
+{% endif %}
+
+<p><a href="{% url 'adminDashboard' %}">Back to Dashboard</a></p>

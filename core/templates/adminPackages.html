@@ -1,0 +1,64 @@
+<h2>Package Management</h2>
+
+<h3>Add Package</h3>
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="name" placeholder="Package name" required>
+    <br>
+    <textarea name="description" placeholder="Description (optional)"></textarea>
+    <br>
+    <label>Category:</label>
+    <select name="category_id" required>
+        <option value="" disabled selected>Select category</option>
+        {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+        {% endfor %}
+    </select>
+    <br>
+    <input type="number" name="price" step="0.01" min="0" placeholder="Base price" required>
+    <br>
+    <label>
+        <input type="checkbox" name="status" checked>
+        Active
+    </label>
+    <br>
+    <button type="submit">Add Package</button>
+</form>
+
+<hr>
+
+<h3>Existing Packages</h3>
+{% if packages %}
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        {% for package in packages %}
+        <tr>
+            <td>{{ package.name }}</td>
+            <td>{{ package.category.name }}</td>
+            <td>₹{{ package.price }}</td>
+            <td>{% if package.status %}Active{% else %}Inactive{% endif %}</td>
+            <td>
+                <a href="{% url 'adminPackageEdit' package.id %}">Edit</a>
+                <form method="post" action="{% url 'adminPackageToggle' package.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    {% if package.status %}
+                        <button type="submit">Deactivate</button>
+                    {% else %}
+                        <button type="submit">Activate</button>
+                    {% endif %}
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No packages yet.</p>
+{% endif %}
+
+<p><a href="{% url 'adminDashboard' %}">Back to Dashboard</a></p>

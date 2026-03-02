@@ -1,0 +1,40 @@
+<h2>Custom Request Detail</h2>
+
+<p><strong>Customer:</strong> {{ request_obj.customer.username }}</p>
+<p><strong>Title:</strong> {{ request_obj.title }}</p>
+<p><strong>Category:</strong> {{ request_obj.category.name }}</p>
+<p><strong>Description:</strong> {{ request_obj.description }}</p>
+<p><strong>Expected Budget:</strong> ₹{{ request_obj.expectedBudget }}</p>
+<p><strong>Status:</strong> {{ request_obj.status }}</p>
+<p><strong>Created:</strong> {{ request_obj.createdAt }}</p>
+
+<hr>
+
+<h3>Update Status</h3>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" name="action" value="approve">Approve</button>
+    <button type="submit" name="action" value="reject">Reject</button>
+</form>
+
+<hr>
+
+<h3>Convert to Package</h3>
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="create_package">
+    <input type="text" name="name" placeholder="Package name" required>
+    <br>
+    <textarea name="description" placeholder="Description (optional)"></textarea>
+    <br>
+    <input type="number" name="price" step="0.01" min="0" placeholder="Package price" required>
+    <br>
+    <label>
+        <input type="checkbox" name="status" checked>
+        Active
+    </label>
+    <br>
+    <button type="submit">Create Package</button>
+</form>
+
+<p><a href="{% url 'adminCustomRequests' %}">Back to Requests</a></p>

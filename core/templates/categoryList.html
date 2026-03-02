@@ -1,0 +1,9 @@
+<h2>Event Categories</h2>
+
+{% for c in categories %}
+    <div>
+        <h3>{{ c.name }}</h3>
+        <p>{{ c.description }}</p>
+        <a href="{% url 'packageList' c.id %}">View Packages</a>
+    </div>
+{% endfor %}

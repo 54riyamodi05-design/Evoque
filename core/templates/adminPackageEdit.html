@@ -1,0 +1,28 @@
+<h2>Edit Package</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="name" value="{{ package.name }}" required>
+    <br>
+    <textarea name="description">{{ package.description }}</textarea>
+    <br>
+    <label>Category:</label>
+    <select name="category_id" required>
+        {% for category in categories %}
+            <option value="{{ category.id }}" {% if category.id == package.category_id %}selected{% endif %}>
+                {{ category.name }}
+            </option>
+        {% endfor %}
+    </select>
+    <br>
+    <input type="number" name="price" step="0.01" min="0" value="{{ package.price }}" required>
+    <br>
+    <label>
+        <input type="checkbox" name="status" {% if package.status %}checked{% endif %}>
+        Active
+    </label>
+    <br>
+    <button type="submit">Save</button>
+</form>
+
+<p><a href="{% url 'adminPackages' %}">Back to Packages</a></p>

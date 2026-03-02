@@ -1,0 +1,17 @@
+<h2>Edit Category</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="name" value="{{ category.name }}" required>
+    <br>
+    <textarea name="description">{{ category.description }}</textarea>
+    <br>
+    <label>
+        <input type="checkbox" name="status" {% if category.status %}checked{% endif %}>
+        Active
+    </label>
+    <br>
+    <button type="submit">Save</button>
+</form>
+
+<p><a href="{% url 'adminCategories' %}">Back to Categories</a></p>

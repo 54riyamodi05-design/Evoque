@@ -1,0 +1,28 @@
+<h2>Edit Venue</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="text" name="name" value="{{ venue.name }}" required>
+    <br>
+    <textarea name="address" required>{{ venue.address }}</textarea>
+    <br>
+    <input type="number" name="capacity" min="1" value="{{ venue.capacity }}" required>
+    <br>
+    <input type="number" name="price" step="0.01" min="0" value="{{ venue.price }}" required>
+    <br>
+    <input type="file" name="image">
+
+     {% if venue.image %}
+        <p>Current Image:</p>
+        <img src="{{ venue.image.url }}" width="200">
+    {% endif %}
+
+    <label>
+        <input type="checkbox" name="status" {% if venue.status %}checked{% endif %}>
+        Active
+    </label>
+    <br>
+    <button type="submit">Save</button>
+</form>
+
+<p><a href="{% url 'adminVenues' %}">Back to Venues</a></p>

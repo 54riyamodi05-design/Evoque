@@ -1,0 +1,47 @@
+<h2>Service Providers</h2>
+
+{% if providers %}
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+
+        {% for provider in providers %}
+        <tr>
+            <td>{{ provider.user.get_full_name|default:provider.user.username }}</td>
+            <td>{{ provider.user.username }}</td>
+            <td>{{ provider.user.email }}</td>
+            <td>{{ provider.phone }}</td>
+            <td>
+                {% if provider.status %}
+                    Approved
+                {% else %}
+                    Pending / Blocked
+                {% endif %}
+            </td>
+            <td>
+                {% if provider.status %}
+                    <form method="post" action="{% url 'deactivateProvider' provider.id %}">
+                        {% csrf_token %}
+                        <button type="submit">Deactivate</button>
+                    </form>
+                {% else %}
+                    <form method="post" action="{% url 'approveProvider' provider.id %}">
+                        {% csrf_token %}
+                        <button type="submit">Approve</button>
+                    </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No service providers found.</p>
+{% endif %}
+
+<p><a href="{% url 'adminDashboard' %}">Back to Dashboard</a></p>

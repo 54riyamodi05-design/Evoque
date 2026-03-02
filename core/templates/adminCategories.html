@@ -1,0 +1,52 @@
+<h2>Category Management</h2>
+
+<h3>Add Category</h3>
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="name" placeholder="Category name" required>
+    <br>
+    <textarea name="description" placeholder="Description (optional)"></textarea>
+    <br>
+    <label>
+        <input type="checkbox" name="status" checked>
+        Active
+    </label>
+    <br>
+    <button type="submit">Add Category</button>
+</form>
+
+<hr>
+
+<h3>Existing Categories</h3>
+{% if categories %}
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        {% for category in categories %}
+        <tr>
+            <td>{{ category.name }}</td>
+            <td>{{ category.description }}</td>
+            <td>{% if category.status %}Active{% else %}Inactive{% endif %}</td>
+            <td>
+                <a href="{% url 'adminCategoryEdit' category.id %}">Edit</a>
+                <form method="post" action="{% url 'adminCategoryToggle' category.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    {% if category.status %}
+                        <button type="submit">Deactivate</button>
+                    {% else %}
+                        <button type="submit">Activate</button>
+                    {% endif %}
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No categories yet.</p>
+{% endif %}
+
+<p><a href="{% url 'adminDashboard' %}">Back to Dashboard</a></p>

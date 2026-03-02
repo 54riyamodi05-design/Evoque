@@ -1,0 +1,38 @@
+<h2>All Orders</h2>
+
+{% if orders %}
+    <table border="1">
+        <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Package</th>
+            <th>Venue</th>
+            <th>Theme</th>
+            <th>Status</th>
+            <th>Payment Status</th>
+            <th>Action</th>
+        </tr>
+        {% for order in orders %}
+        <tr>
+            <td>#{{ order.id }}</td>
+            <td>{{ order.user.username }}</td>
+            <td>{{ order.package.name }}</td>
+            <td>{% if order.venue %}{{ order.venue.name }}{% else %}-{% endif %}</td>
+            <td>{{ order.get_theme_type_display }}</td>
+            <td>{{ order.get_status_display }}</td>
+            <td>
+                {% if order.payment %}
+                    {{ order.payment.get_status_display }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td><a href="{% url 'adminOrderDetail' order.id %}">View</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No orders found.</p>
+{% endif %}
+
+<p><a href="{% url 'adminDashboard' %}">Back to Dashboard</a></p>

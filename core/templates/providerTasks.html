@@ -1,0 +1,38 @@
+<h2>My Assigned Tasks</h2>
+
+{% if tasks %}
+    <table border="1">
+        <tr>
+            <th>Order</th>
+            <th>Package</th>
+            <th>Venue</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Update</th>
+        </tr>
+        {% for task in tasks %}
+        <tr>
+            <td>#{{ task.order.id }}</td>
+            <td>{{ task.order.package.name }}</td>
+            <td>{% if task.order.venue %}{{ task.order.venue.name }}{% else %}-{% endif %}</td>
+            <td>{{ task.description }}</td>
+            <td>{{ task.get_status_display }}</td>
+            <td>
+                <form method="post" action="{% url 'providerTaskUpdate' task.id %}">
+                    {% csrf_token %}
+                    <select name="status">
+                        <option value="PENDING" {% if task.status == 'PENDING' %}selected{% endif %}>Pending</option>
+                        <option value="IN_PROGRESS" {% if task.status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+                        <option value="COMPLETED" {% if task.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                    </select>
+                    <button type="submit">Update</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No tasks assigned yet.</p>
+{% endif %}
+
+<p><a href="{% url 'providerDashboard' %}">Back to Dashboard</a></p>

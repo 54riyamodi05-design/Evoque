@@ -1,0 +1,33 @@
+<h2>Order Details</h2>
+
+<p><strong>Package:</strong> {{ order.package.name }}</p>
+<p><strong>Category:</strong> {{ order.package.category.name }}</p>
+<p><strong>Theme:</strong> {{ order.get_theme_type_display }}</p>
+<p><strong>Order Status:</strong> {{ order.get_status_display }}</p>
+{% if order.status == 'PENDING' %}
+    <form method="post" action="{% url 'cancelOrder' order.id %}">
+        {% csrf_token %}
+        <button type="submit">Cancel Order</button>
+    </form>
+{% endif %}
+
+<h3>Venue Details</h3>
+{% if order.venue %}
+    <p><strong>Name:</strong> {{ order.venue.name }}</p>
+    <p><strong>Address:</strong> {{ order.venue.address }}</p>
+    <p><strong>Capacity:</strong> {{ order.venue.capacity }}</p>
+    <p><strong>Price:</strong> ₹{{ order.venue.price }}</p>
+{% else %}
+    <p>No venue selected.</p>
+{% endif %}
+
+<h3>Payment Details</h3>
+<p><strong>Final Amount:</strong> ₹{{ final_amount }}</p>
+{% if payment %}
+    <p><strong>Payment Method:</strong> {{ payment.get_payment_method_display }}</p>
+    <p><strong>Payment Status:</strong> {{ payment.get_status_display }}</p>
+{% else %}
+    <p>Payment details not available.</p>
+{% endif %}
+
+<p><a href="{% url 'customerOrder' %}">Back to My Orders</a></p>
