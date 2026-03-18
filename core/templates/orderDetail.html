@@ -1,33 +1,64 @@
-<h2>Order Details</h2>
+{% extends 'base.html' %}
 
-<p><strong>Package:</strong> {{ order.package.name }}</p>
-<p><strong>Category:</strong> {{ order.package.category.name }}</p>
-<p><strong>Theme:</strong> {{ order.get_theme_type_display }}</p>
-<p><strong>Order Status:</strong> {{ order.get_status_display }}</p>
-{% if order.status == 'PENDING' %}
-    <form method="post" action="{% url 'cancelOrder' order.id %}">
-        {% csrf_token %}
-        <button type="submit">Cancel Order</button>
-    </form>
-{% endif %}
+{% block title %}Order Details - Evoque{% endblock %}
 
-<h3>Venue Details</h3>
+{% block content %}
+<div class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="margin: 0;">Order Details</h2>
+    <a href="{% url 'customerOrder' %}" class="btn btn-secondary">Back to My Orders</a>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <div class="glass-panel" style="padding: 1.5rem;">
+        <h3 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; margin-bottom: 1rem;">Package Information</h3>
+        <p><strong>Package:</strong> <span style="color: var(--primary-accent);">{{ order.package.name }}</span></p>
+        <p><strong>Category:</strong> {{ order.package.category.name }}</p>
+        <p><strong>Event Date:</strong> <span style="color: var(--text-color);">{{ order.event_date }}</span></p>
+        <p><strong>Theme:</strong> {{ order.get_theme_type_display }}</p>
+    </div>
+
+    <div class="glass-panel" style="padding: 1.5rem;">
+        <h3 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; margin-bottom: 1rem;">Status & Billing</h3>
+        <p><strong>Order Status:</strong> 
+            <span style="font-weight: 600; 
+                {% if order.status == 'COMPLETED' %}color: var(--success);
+                {% elif order.status == 'PENDING' %}color: #e3b341;
+                {% elif order.status == 'CANCELLED' %}color: var(--danger);
+                {% endif %}">
+                {{ order.get_status_display }}
+            </span>
+        </p>
+        <p><strong>Payment Status:</strong> {{ payment.get_status_display|default:"Not Available" }}</p>
+        <p><strong>Payment Method:</strong> {{ payment.get_payment_method_display|default:"-" }}</p>
+        <p><strong>Seasonal Discount:</strong> {{ order.seasonal_discount_percent }}%</p>
+        <p style="font-size: 1.25rem; font-weight: 700; margin-top: 1rem; color: var(--success);">Final Amount: ₹{{ final_amount }}</p>
+    </div>
+</div>
+
 {% if order.venue %}
-    <p><strong>Name:</strong> {{ order.venue.name }}</p>
-    <p><strong>Address:</strong> {{ order.venue.address }}</p>
-    <p><strong>Capacity:</strong> {{ order.venue.capacity }}</p>
-    <p><strong>Price:</strong> ₹{{ order.venue.price }}</p>
-{% else %}
-    <p>No venue selected.</p>
+<div class="glass-panel" style="margin-bottom: 2rem;">
+    <h3 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; margin-bottom: 1rem;">Venue Details</h3>
+    <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+        {% if order.venue.image %}
+        <img src="{{ order.venue.image.url }}" style="width: 250px; height: 160px; object-fit: cover; border-radius: 8px;">
+        {% endif %}
+        <div>
+            <h4 style="color: var(--primary-accent); margin-bottom: 0.5rem;">{{ order.venue.name }}</h4>
+            <p style="margin-bottom: 0.5rem;"><strong>Address:</strong> {{ order.venue.address }}</p>
+            <p style="margin-bottom: 0.5rem;"><strong>Capacity:</strong> {{ order.venue.capacity }} people</p>
+            <p style="margin-bottom: 0;"><strong>Price:</strong> ₹{{ order.venue.price }}</p>
+        </div>
+    </div>
+</div>
 {% endif %}
 
-<h3>Payment Details</h3>
-<p><strong>Final Amount:</strong> ₹{{ final_amount }}</p>
-{% if payment %}
-    <p><strong>Payment Method:</strong> {{ payment.get_payment_method_display }}</p>
-    <p><strong>Payment Status:</strong> {{ payment.get_status_display }}</p>
-{% else %}
-    <p>Payment details not available.</p>
+{% if order.status == 'PENDING' %}
+<div style="text-align: right;">
+    <form method="post" action="{% url 'cancelOrder' order.id %}" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-secondary" style="color: var(--danger); border-color: rgba(248,81,73,0.3);">Cancel Order</button>
+    </form>
+</div>
 {% endif %}
 
-<p><a href="{% url 'customerOrder' %}">Back to My Orders</a></p>
+{% endblock %}

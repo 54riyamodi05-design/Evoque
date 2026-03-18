@@ -1,112 +1,167 @@
-<h2>Order Detail</h2>
+{% extends 'base.html' %}
 
-<p><strong>Order ID:</strong> #{{ order.id }}</p>
-<p><strong>Customer:</strong> {{ order.user.username }}</p>
-<p><strong>Package:</strong> {{ order.package.name }}</p>
-<p><strong>Category:</strong> {{ order.package.category.name }}</p>
-<p><strong>Theme:</strong> {{ order.get_theme_type_display }}</p>
-<p><strong>Status:</strong> {{ order.get_status_display }}</p>
+{% block title %}Order Details - Evoque Admin{% endblock %}
 
-<h3>Venue</h3>
-{% if order.venue %}
-    <p><strong>Name:</strong> {{ order.venue.name }}</p>
-    <p><strong>Address:</strong> {{ order.venue.address }}</p>
-    <p><strong>Capacity:</strong> {{ order.venue.capacity }}</p>
-    <p><strong>Price:</strong> ₹{{ order.venue.price }}</p>
-{% else %}
-    <p>No venue selected.</p>
-{% endif %}
+{% block content %}
+<div class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="margin: 0;">Order #{{ order.id }}</h2>
+    <a href="{% url 'adminOrders' %}" class="btn btn-secondary">Back to Orders</a>
+</div>
 
-<h3>Payment</h3>
-{% if payment %}
-    <p><strong>Amount:</strong> ₹{{ payment.amount }}</p>
-    <p><strong>Method:</strong> {{ payment.get_payment_method_display }}</p>
-    <p><strong>Status:</strong> {{ payment.get_status_display }}</p>
-{% else %}
-    <p>No payment record.</p>
-{% endif %}
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <!-- Order Info -->
+    <div class="glass-panel" style="padding: 1.5rem;">
+        <h3 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; margin-bottom: 1rem;">Order Details</h3>
+        <p><strong>Customer:</strong> {{ order.user.username }}</p>
+        <p><strong>Package:</strong> <span style="color: var(--primary-accent);">{{ order.package.name }}</span></p>
+        <p><strong>Category:</strong> {{ order.package.category.name }}</p>
+        <p><strong>Event Date:</strong> {{ order.event_date }}</p>
+        <p><strong>Theme:</strong> {{ order.get_theme_type_display }}</p>
+        <p><strong>Discount:</strong> {{ order.seasonal_discount_percent }}%</p>
+        <p style="margin-top: 1rem; border-top: 1px solid var(--glass-border); padding-top: 1rem;">
+            <strong>Status:</strong> 
+            <span style="font-weight: 600; 
+                {% if order.status == 'COMPLETED' %}color: var(--success);
+                {% elif order.status == 'PENDING' %}color: #e3b341;
+                {% elif order.status == 'CANCELLED' %}color: var(--danger);
+                {% endif %}">
+                {{ order.get_status_display }}
+            </span>
+        </p>
 
-<h3>Assign Service Provider</h3>
-{% if providers %}
-    <form method="post">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="assign_provider">
-        <select name="provider_id" required>
-            <option value="" disabled selected>Select provider</option>
-            {% for p in providers %}
-                <option value="{{ p.id }}" {% if order.service_provider_id == p.id %}selected{% endif %}>
-                    {{ p.user.username }}
-                </option>
-            {% endfor %}
-        </select>
-        <button type="submit">Assign</button>
-    </form>
-    {% if order.service_provider %}
-        <p>Currently assigned: {{ order.service_provider.user.username }}</p>
-    {% endif %}
-{% else %}
-    <p>No approved providers available.</p>
-{% endif %}
-
-<h3>Tasks</h3>
-{% if tasks %}
-    <table border="1">
-        <tr>
-            <th>Provider</th>
-            <th>Description</th>
-            <th>Status</th>
-        </tr>
-        {% for task in tasks %}
-        <tr>
-            <td>{{ task.service_provider.user.username }}</td>
-            <td>{{ task.description }}</td>
-            <td>{{ task.get_status_display }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-{% else %}
-    <p>No tasks yet.</p>
-{% endif %}
-
-<h4>Create Task</h4>
-{% if providers %}
-    <form method="post">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="create_task">
-        <label>Assign To:</label>
-        <select name="provider_id" required>
-            <option value="" disabled selected>Select provider</option>
-            {% for p in providers %}
-                <option value="{{ p.id }}">{{ p.user.username }}</option>
-            {% endfor %}
-        </select>
-        <br>
-        <textarea name="description" placeholder="Task description" required></textarea>
-        <br>
-        <select name="status">
-            <option value="PENDING">Pending</option>
-            <option value="IN_PROGRESS">In Progress</option>
-            <option value="COMPLETED">Completed</option>
-        </select>
-        <br>
-        <button type="submit">Create Task</button>
-    </form>
-{% endif %}
-
-<h3>Update Order Status</h3>
-{% if order.status == 'PENDING' or order.status == 'CONFIRMED' %}
-    <form method="post">
-        {% csrf_token %}
-        {% if order.status == 'PENDING' %}
-            <input type="hidden" name="action" value="status_confirm">
-            <button type="submit">Mark as Confirmed</button>
-        {% elif order.status == 'CONFIRMED' %}
-            <input type="hidden" name="action" value="status_complete">
-            <button type="submit">Mark as Completed</button>
+        {% if order.status == 'PENDING' or order.status == 'CONFIRMED' %}
+        <div style="margin-top: 1rem;">
+            <form method="post">
+                {% csrf_token %}
+                {% if order.status == 'PENDING' %}
+                    <input type="hidden" name="action" value="status_confirm">
+                    <button type="submit" class="btn btn-primary btn-block">Mark as Confirmed</button>
+                {% elif order.status == 'CONFIRMED' %}
+                    <input type="hidden" name="action" value="status_complete">
+                    <button type="submit" class="btn btn-primary btn-block" style="background: var(--success);">Mark as Completed</button>
+                {% endif %}
+            </form>
+        </div>
+        {% else %}
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 1rem;">No further status updates allowed.</p>
         {% endif %}
-    </form>
-{% else %}
-    <p>No further status updates allowed.</p>
-{% endif %}
+    </div>
 
-<p><a href="{% url 'adminOrders' %}">Back to Orders</a></p>
+    <!-- Venue & Payment Setup -->
+    <div>
+        <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+            <h3 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; margin-bottom: 1rem;">Payment</h3>
+            {% if payment %}
+                <p><strong>Amount:</strong> ₹{{ payment.amount }}</p>
+                <p><strong>Method:</strong> {{ payment.get_payment_method_display }}</p>
+                <p><strong>Status:</strong> {{ payment.get_status_display }}</p>
+            {% else %}
+                <p style="color: var(--text-muted);">No payment record found.</p>
+            {% endif %}
+        </div>
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <h3 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; margin-bottom: 1rem;">Venue</h3>
+            {% if order.venue %}
+                <p><strong>Name:</strong> <span style="color: var(--primary-accent);">{{ order.venue.name }}</span></p>
+                <p><strong>Address:</strong> {{ order.venue.address }}</p>
+                <p><strong>Capacity:</strong> {{ order.venue.capacity }} guests</p>
+                <p><strong>Price:</strong> ₹{{ order.venue.price }}</p>
+            {% else %}
+                <p style="color: var(--text-muted);">No venue selected.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem;">
+    <h3 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; margin-bottom: 1rem;">Service Tasks & Providers</h3>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div>
+            <h4>Tasks</h4>
+            {% if tasks %}
+                <table style="width: 100%; border-collapse: collapse; text-align: left; margin-bottom: 1.5rem;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--glass-border);">
+                            <th style="padding: 0.5rem; color: var(--primary-accent);">Provider</th>
+                            <th style="padding: 0.5rem; color: var(--primary-accent);">Description</th>
+                            <th style="padding: 0.5rem; color: var(--primary-accent);">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks %}
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 0.5rem;">{{ task.service_provider.user.username }}</td>
+                            <td style="padding: 0.5rem;">{{ task.description }}</td>
+                            <td style="padding: 0.5rem;">
+                                <span style="font-size:0.85rem; padding: 0.2rem 0.4rem; border-radius:4px;
+                                    {% if task.status == 'COMPLETED' %}background:rgba(46,160,67,0.2);color:#3fb950;
+                                    {% elif task.status == 'IN_PROGRESS' %}background:rgba(88,166,255,0.2);color:#58a6ff;
+                                    {% else %}background:rgba(210,153,34,0.2);color:#e3b341;
+                                    {% endif %}">{{ task.get_status_display }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">No tasks assigned yet.</p>
+            {% endif %}
+
+            {% if providers %}
+                <h4>Create New Task</h4>
+                <form method="post" class="form-group" style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="create_task">
+                    
+                    <label>Assign To Provider:</label>
+                    <select name="provider_id" required style="margin-bottom: 1rem;">
+                        <option value="" disabled selected>Select provider</option>
+                        {% for p in providers %}
+                            <option value="{{ p.id }}">{{ p.user.username }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label>Task Description:</label>
+                    <textarea name="description" placeholder="Task description..." required style="margin-bottom: 1rem;"></textarea>
+
+                    <label>Initial Status:</label>
+                    <select name="status" style="margin-bottom: 1rem;">
+                        <option value="PENDING">Pending</option>
+                        <option value="IN_PROGRESS">In Progress</option>
+                        <option value="COMPLETED">Completed</option>
+                    </select>
+
+                    <button type="submit" class="btn btn-secondary btn-block">Create Task</button>
+                </form>
+            {% endif %}
+        </div>
+
+        <div>
+            <h4>Lead Service Provider</h4>
+            {% if providers %}
+                <form method="post" style="margin-bottom: 1rem;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="assign_provider">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <select name="provider_id" required>
+                            <option value="" disabled selected>Select primary provider</option>
+                            {% for p in providers %}
+                                <option value="{{ p.id }}" {% if order.service_provider_id == p.id %}selected{% endif %}>
+                                    {{ p.user.username }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-primary">Assign</button>
+                    </div>
+                </form>
+                {% if order.service_provider %}
+                    <p>Currently assigned primary provider: <strong style="color: var(--primary-accent);">{{ order.service_provider.user.username }}</strong></p>
+                {% endif %}
+            {% else %}
+                <p style="color: var(--text-muted);">No approved providers available.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

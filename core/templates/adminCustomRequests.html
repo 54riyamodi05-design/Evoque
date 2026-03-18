@@ -1,27 +1,51 @@
-<h2>Custom Package Requests</h2>
+{% extends 'base.html' %}
 
-{% if requests %}
-    <table border="1">
-        <tr>
-            <th>Customer</th>
-            <th>Title</th>
-            <th>Category</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
+{% block title %}Custom Requests - Evoque Admin{% endblock %}
 
-        {% for r in requests %}
-        <tr>
-            <td>{{ r.customer.username }}</td>
-            <td>{{ r.title }}</td>
-            <td>{{ r.category.name }}</td>
-            <td>{{ r.status }}</td>
-            <td><a href="{% url 'adminCustomRequestDetail' r.id %}">View</a></td>
-        </tr>
-        {% endfor %}
+{% block content %}
+<div class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="margin: 0;">Custom Package Requests</h2>
+    <a href="{% url 'adminDashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+
+<div class="glass-panel" style="overflow-x: auto;">
+    {% if requests %}
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+            <tr style="border-bottom: 1px solid var(--glass-border);">
+                <th style="padding: 1rem; color: var(--primary-accent);">Customer</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Title</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Category</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Status</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in requests %}
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s;">
+                <td style="padding: 1rem;">{{ r.customer.username }}</td>
+                <td style="padding: 1rem;"><strong>{{ r.title }}</strong></td>
+                <td style="padding: 1rem;">{{ r.category.name }}</td>
+                <td style="padding: 1rem;">
+                    <span style="font-weight: 500;
+                        {% if r.status == 'APPROVED' %}color: var(--success);
+                        {% elif r.status == 'PENDING' %}color: #e3b341;
+                        {% elif r.status == 'REJECTED' %}color: var(--danger);
+                        {% endif %}">
+                        {{ r.status }}
+                    </span>
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="{% url 'adminCustomRequestDetail' r.id %}" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
-{% else %}
-    <p>No custom requests yet.</p>
-{% endif %}
-
-<p><a href="{% url 'adminDashboard' %}">Back to Dashboard</a></p>
+    {% else %}
+    <div style="text-align: center; padding: 2rem;">
+        <p>No custom requests yet.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

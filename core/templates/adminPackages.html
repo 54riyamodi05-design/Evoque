@@ -1,64 +1,102 @@
-<h2>Package Management</h2>
+{% extends 'base.html' %}
 
-<h3>Add Package</h3>
-<form method="post">
-    {% csrf_token %}
-    <input type="text" name="name" placeholder="Package name" required>
-    <br>
-    <textarea name="description" placeholder="Description (optional)"></textarea>
-    <br>
-    <label>Category:</label>
-    <select name="category_id" required>
-        <option value="" disabled selected>Select category</option>
-        {% for category in categories %}
-            <option value="{{ category.id }}">{{ category.name }}</option>
-        {% endfor %}
-    </select>
-    <br>
-    <input type="number" name="price" step="0.01" min="0" placeholder="Base price" required>
-    <br>
-    <label>
-        <input type="checkbox" name="status" checked>
-        Active
-    </label>
-    <br>
-    <button type="submit">Add Package</button>
-</form>
+{% block title %}Package Management - Evoque Admin{% endblock %}
 
-<hr>
+{% block content %}
+<div class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="margin: 0;">Package Management</h2>
+    <a href="{% url 'adminDashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
 
-<h3>Existing Packages</h3>
-{% if packages %}
-    <table border="1">
-        <tr>
-            <th>Name</th>
-            <th>Category</th>
-            <th>Price</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
-        {% for package in packages %}
-        <tr>
-            <td>{{ package.name }}</td>
-            <td>{{ package.category.name }}</td>
-            <td>₹{{ package.price }}</td>
-            <td>{% if package.status %}Active{% else %}Inactive{% endif %}</td>
-            <td>
-                <a href="{% url 'adminPackageEdit' package.id %}">Edit</a>
-                <form method="post" action="{% url 'adminPackageToggle' package.id %}" style="display:inline;">
-                    {% csrf_token %}
-                    {% if package.status %}
-                        <button type="submit">Deactivate</button>
-                    {% else %}
-                        <button type="submit">Activate</button>
-                    {% endif %}
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-{% else %}
-    <p>No packages yet.</p>
-{% endif %}
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+    <!-- Add Package Form -->
+    <div class="glass-panel" style="height: fit-content;">
+        <h3 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; margin-bottom: 1.5rem;">Add Package</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Package Name</label>
+                <input type="text" name="name" placeholder="Package name" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Description (Optional)</label>
+                <textarea name="description" placeholder="Description..." rows="3"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Category</label>
+                <select name="category_id" required>
+                    <option value="" disabled selected>Select category</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-<p><a href="{% url 'adminDashboard' %}">Back to Dashboard</a></p>
+            <div class="form-group">
+                <label>Base Price (₹)</label>
+                <input type="number" name="price" step="0.01" min="0" placeholder="0.00" required>
+            </div>
+            
+            <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" name="status" id="status" checked style="width: auto;">
+                <label for="status" style="margin: 0;">Active Package</label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Add Package</button>
+        </form>
+    </div>
+
+    <!-- Existing Packages -->
+    <div class="glass-panel" style="overflow-x: auto;">
+        <h3 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; margin-bottom: 1.5rem;">Existing Packages</h3>
+        
+        {% if packages %}
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--glass-border);">
+                    <th style="padding: 1rem; color: var(--primary-accent);">Name</th>
+                    <th style="padding: 1rem; color: var(--primary-accent);">Category</th>
+                    <th style="padding: 1rem; color: var(--primary-accent);">Price</th>
+                    <th style="padding: 1rem; color: var(--primary-accent);">Status</th>
+                    <th style="padding: 1rem; color: var(--primary-accent);">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for package in packages %}
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s;">
+                    <td style="padding: 1rem;"><strong>{{ package.name }}</strong></td>
+                    <td style="padding: 1rem;">{{ package.category.name }}</td>
+                    <td style="padding: 1rem;">₹{{ package.price }}</td>
+                    <td style="padding: 1rem;">
+                        <span style="padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem; 
+                            {% if package.status %}background: rgba(46,160,67,0.2); color: #3fb950;
+                            {% else %}background: rgba(248,81,73,0.2); color: #ff7b72;
+                            {% endif %}">
+                            {% if package.status %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </td>
+                    <td style="padding: 1rem; display: flex; gap: 0.5rem;">
+                        <a href="{% url 'adminPackageEdit' package.id %}" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">Edit</a>
+                        <form method="post" action="{% url 'adminPackageToggle' package.id %}" style="margin: 0;">
+                            {% csrf_token %}
+                            {% if package.status %}
+                                <button type="submit" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; color: #e3b341; border-color: rgba(210,153,34,0.3);">Deactivate</button>
+                            {% else %}
+                                <button type="submit" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; color: #3fb950; border-color: rgba(46,160,67,0.3);">Activate</button>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div style="text-align: center; padding: 2rem;">
+            <p>No packages yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

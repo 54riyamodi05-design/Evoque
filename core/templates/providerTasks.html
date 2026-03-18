@@ -1,38 +1,61 @@
-<h2>My Assigned Tasks</h2>
+{% extends 'base.html' %}
 
-{% if tasks %}
-    <table border="1">
-        <tr>
-            <th>Order</th>
-            <th>Package</th>
-            <th>Venue</th>
-            <th>Description</th>
-            <th>Status</th>
-            <th>Update</th>
-        </tr>
-        {% for task in tasks %}
-        <tr>
-            <td>#{{ task.order.id }}</td>
-            <td>{{ task.order.package.name }}</td>
-            <td>{% if task.order.venue %}{{ task.order.venue.name }}{% else %}-{% endif %}</td>
-            <td>{{ task.description }}</td>
-            <td>{{ task.get_status_display }}</td>
-            <td>
-                <form method="post" action="{% url 'providerTaskUpdate' task.id %}">
-                    {% csrf_token %}
-                    <select name="status">
-                        <option value="PENDING" {% if task.status == 'PENDING' %}selected{% endif %}>Pending</option>
-                        <option value="IN_PROGRESS" {% if task.status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
-                        <option value="COMPLETED" {% if task.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
-                    </select>
-                    <button type="submit">Update</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
+{% block title %}My Assigned Tasks - Evoque{% endblock %}
+
+{% block content %}
+<div class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="margin: 0;">My Assigned Tasks</h2>
+    <a href="{% url 'providerDashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+
+<div class="glass-panel" style="overflow-x: auto; padding: 1.5rem;">
+    {% if tasks %}
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+            <tr style="border-bottom: 1px solid var(--glass-border);">
+                <th style="padding: 1rem; color: var(--primary-accent);">Order</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Package</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Venue</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Description</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Status</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s;">
+                <td style="padding: 1rem;">#{{ task.order.id }}</td>
+                <td style="padding: 1rem;">{{ task.order.package.name }}</td>
+                <td style="padding: 1rem;">{% if task.order.venue %}{{ task.order.venue.name }}{% else %}-{% endif %}</td>
+                <td style="padding: 1rem;">{{ task.description }}</td>
+                <td style="padding: 1rem;">
+                    <span style="font-weight: 500;
+                        {% if task.status == 'COMPLETED' %}color: var(--success);
+                        {% elif task.status == 'IN_PROGRESS' %}color: var(--primary-accent);
+                        {% elif task.status == 'PENDING' %}color: #e3b341;
+                        {% endif %}">
+                        {{ task.get_status_display }}
+                    </span>
+                </td>
+                <td style="padding: 1rem;">
+                    <form method="post" action="{% url 'providerTaskUpdate' task.id %}" style="display: flex; gap: 0.5rem; align-items: center; margin: 0;">
+                        {% csrf_token %}
+                        <select name="status" style="padding: 0.4rem; font-size: 0.85rem; width: auto; min-width: 120px; background: rgba(0,0,0,0.3);">
+                            <option value="PENDING" {% if task.status == 'PENDING' %}selected{% endif %}>Pending</option>
+                            <option value="IN_PROGRESS" {% if task.status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+                            <option value="COMPLETED" {% if task.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">Update</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
-{% else %}
-    <p>No tasks assigned yet.</p>
-{% endif %}
-
-<p><a href="{% url 'providerDashboard' %}">Back to Dashboard</a></p>
+    {% else %}
+    <div style="text-align: center; padding: 3rem 1rem;">
+        <p style="margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-color);">No tasks assigned yet.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

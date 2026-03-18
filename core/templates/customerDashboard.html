@@ -1,7 +1,15 @@
-<h2>Customer Dashboard</h2>
-<a href="{% url 'logout' %}">Logout</a><br>
-<a href="{% url 'customPackage' %}">Request Custom Package</a><br>
-<a href="{%url 'categoryList'%}">Category List</a><br>
-<a href="{% url 'customerOrder' %}">My Orders</a><br>
-<a href="{%url 'myCustomPackages'%}">See Your custom package requests</a>
+{% extends 'base.html' %}
 
+{% block title %}Customer Dashboard - Evoque{% endblock %}
+
+{% block content %}
+<div class="glass-panel">
+    <h2>Customer Dashboard</h2>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem;">
+        <a href="{% url 'categoryList' %}" class="btn btn-primary">Browse Categories</a>
+        <a href="{% url 'customerOrder' %}" class="btn btn-secondary">My Orders</a>
+        <a href="{% url 'customPackage' %}" class="btn btn-secondary">Request Custom Package</a>
+        <a href="{% url 'myCustomPackages' %}" class="btn btn-secondary">My Custom Requests</a>
+    </div>
+</div>
+{% endblock %}

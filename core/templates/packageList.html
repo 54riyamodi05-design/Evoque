@@ -1,10 +1,29 @@
-<h2>Packages</h2>
+{% extends 'base.html' %}
 
-{% for p in packages %}
-    <div>
-        <h3>{{ p.name }}</h3>
-        <p>{{ p.description }}</p>
-        <p>Base Price: ₹{{ p.price }}</p>
-        <a href="{%url 'packageDetail' p.id%}">View Details</a>
+{% block title %}Packages - Evoque{% endblock %}
+
+{% block content %}
+<div class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="margin: 0;">Packages</h2>
+    <a href="{% url 'categoryList' %}" class="btn btn-secondary">Back to Categories</a>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+    {% for p in packages %}
+    <div class="glass-panel" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <h3 style="color: var(--primary-accent);">{{ p.name }}</h3>
+            <p>{{ p.description }}</p>
+            <p style="font-size: 1.25rem; font-weight: 600; color: var(--success); margin: 1rem 0;">Base Price: ₹{{ p.price }}</p>
+        </div>
+        <div style="margin-top: 1.5rem;">
+            <a href="{% url 'packageDetail' p.id %}" class="btn btn-primary btn-block">View Details</a>
+        </div>
     </div>
-{% endfor %}
+    {% empty %}
+    <div class="glass-panel" style="grid-column: 1 / -1; text-align: center;">
+        <p>No packages available in this category at the moment.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

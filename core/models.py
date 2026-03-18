@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from decimal import Decimal
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 # Create your models here.
 
@@ -103,6 +105,12 @@ class Order(models.Model):
     )
 
     venue=models.ForeignKey(Venue, on_delete=models.CASCADE,null=True, blank=True)
+    event_date = models.DateField(null=True, blank=True)
+    seasonal_discount_percent = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=Decimal('0.00')
+    )
 
     # When order was placed
     order_date = models.DateTimeField(auto_now_add=True)
@@ -114,10 +122,24 @@ class Order(models.Model):
         default='PENDING'
     )
 
+    def clean(self):
+        if self.event_date and self.event_date < timezone.localdate():
+            raise ValidationError({'event_date': 'Event date cannot be in the past.'})
+
+    def get_seasonal_discount_percent(self):
+        if not self.event_date or not self.package_id:
+            return Decimal('0.00')
+
+        category_name = (self.package.category.name or '').strip().lower()
+        if category_name == 'wedding' and self.event_date.month in (11, 12, 1, 2):
+            return Decimal('10.00')
+
+        return Decimal('0.00')
+
     def get_final_price(self):
         """
         Calculates final price based on package base price
-        and theme multiplier.
+        and theme multiplier with seasonal discount.
         """
         THEME_MULTIPLIER = {
             'CLASSIC': Decimal(1.0),
@@ -125,7 +147,15 @@ class Order(models.Model):
             'SUPREME': Decimal(1.6),
         }
         multiplier = THEME_MULTIPLIER.get(self.theme_type, Decimal(1.0))
-        return self.package.price * multiplier
+        themed_price = self.package.price * multiplier
+        discount_percent = self.get_seasonal_discount_percent()
+        discount_amount = (themed_price * discount_percent) / Decimal('100')
+        return themed_price - discount_amount
+
+    def save(self, *args, **kwargs):
+        self.seasonal_discount_percent = self.get_seasonal_discount_percent()
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Order #{self.id} - {self.user.username}"

@@ -1,15 +1,46 @@
-<form method="post">
-    {% csrf_token %}
+{% extends 'base.html' %}
 
-    <select name="category" required>
-        {% for c in categories %}
-        <option value="{{ c.id }}">{{ c.name }}</option>
-        {% endfor %}
-    </select>
+{% block title %}Request Custom Package - Evoque{% endblock %}
 
-    <input name="title" placeholder="Custom Package Title" required>
-    <textarea name="description" placeholder="Describe your event" required></textarea>
-    <input name="budget" placeholder="Expected Budget (optional)">
+{% block content %}
+<div class="center-flex">
+    <div class="glass-panel" style="width: 100%; max-width: 600px;">
+        <h2 style="margin-bottom: 0.5rem;">Request Custom Package</h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem;">Tell us what you need, and we'll create a custom experience for you.</p>
 
-    <button type="submit">Submit Request</button>
-</form>
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>Event Category</label>
+                <select name="category" required>
+                    <option value="" disabled selected>Select category</option>
+                    {% for c in categories %}
+                    <option value="{{ c.id }}">{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" name="title" placeholder="A short title for your request" required>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" placeholder="Describe your event details, requirements, and preferences..." rows="5" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Expected Budget (₹)</label>
+                <input type="number" name="budget" placeholder="e.g. 50000" min="0">
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">Submit Request</button>
+                <a href="{% url 'customerDashboard' %}" class="btn btn-secondary" style="flex: 1; text-align: center;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

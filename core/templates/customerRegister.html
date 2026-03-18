@@ -1,8 +1,44 @@
-<form method="post">
-    {% csrf_token %}
-    <input name="username" placeholder="Username" required>
-    <input name="email" type="email" placeholder="Email" required>
-    <input name="password" type="password" placeholder="Password" required>
-    <input name="phone" placeholder="Phone" required>
-    <button type="submit">Register</button>
-</form>
+{% extends 'base.html' %}
+
+{% block title %}Customer Registration - Evoque{% endblock %}
+
+{% block content %}
+<div class="center-flex">
+    <div class="auth-wrapper glass-panel">
+        <div class="auth-header">
+            <h2>Customer Registration</h2>
+            <p>Create an account to manage your events.</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Choose a username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="your@email.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="text" id="phone" name="phone" placeholder="+1234567890" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Register</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{% url 'login' %}">Log In</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

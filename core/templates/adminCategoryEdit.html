@@ -1,17 +1,35 @@
-<h2>Edit Category</h2>
+{% extends 'base.html' %}
 
-<form method="post">
-    {% csrf_token %}
-    <input type="text" name="name" value="{{ category.name }}" required>
-    <br>
-    <textarea name="description">{{ category.description }}</textarea>
-    <br>
-    <label>
-        <input type="checkbox" name="status" {% if category.status %}checked{% endif %}>
-        Active
-    </label>
-    <br>
-    <button type="submit">Save</button>
-</form>
+{% block title %}Edit Category - Evoque Admin{% endblock %}
 
-<p><a href="{% url 'adminCategories' %}">Back to Categories</a></p>
+{% block content %}
+<div class="center-flex">
+    <div class="glass-panel" style="width: 100%; max-width: 500px;">
+        <h2 style="margin-bottom: 2rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">Edit Category</h2>
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>Category Name</label>
+                <input type="text" name="name" value="{{ category.name }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" rows="4">{{ category.description|default_if_none:"" }}</textarea>
+            </div>
+            
+            <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" name="status" id="status" {% if category.status %}checked{% endif %} style="width: auto;">
+                <label for="status" style="margin: 0;">Active Category</label>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">Save Changes</button>
+                <a href="{% url 'adminCategories' %}" class="btn btn-secondary" style="flex: 1; text-align: center;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

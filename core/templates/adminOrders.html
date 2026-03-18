@@ -1,38 +1,66 @@
-<h2>All Orders</h2>
+{% extends 'base.html' %}
 
-{% if orders %}
-    <table border="1">
-        <tr>
-            <th>Order ID</th>
-            <th>Customer</th>
-            <th>Package</th>
-            <th>Venue</th>
-            <th>Theme</th>
-            <th>Status</th>
-            <th>Payment Status</th>
-            <th>Action</th>
-        </tr>
-        {% for order in orders %}
-        <tr>
-            <td>#{{ order.id }}</td>
-            <td>{{ order.user.username }}</td>
-            <td>{{ order.package.name }}</td>
-            <td>{% if order.venue %}{{ order.venue.name }}{% else %}-{% endif %}</td>
-            <td>{{ order.get_theme_type_display }}</td>
-            <td>{{ order.get_status_display }}</td>
-            <td>
-                {% if order.payment %}
-                    {{ order.payment.get_status_display }}
-                {% else %}
-                    -
-                {% endif %}
-            </td>
-            <td><a href="{% url 'adminOrderDetail' order.id %}">View</a></td>
-        </tr>
-        {% endfor %}
+{% block title %}All Orders - Evoque Admin{% endblock %}
+
+{% block content %}
+<div class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="margin: 0;">All Orders</h2>
+    <a href="{% url 'adminDashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+
+<div class="glass-panel" style="overflow-x: auto;">
+    {% if orders %}
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+            <tr style="border-bottom: 1px solid var(--glass-border);">
+                <th style="padding: 1rem; color: var(--primary-accent);">Order ID</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Customer</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Package</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Event Date</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Theme</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Status</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Payment</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s;">
+                <td style="padding: 1rem;">#{{ order.id }}</td>
+                <td style="padding: 1rem;">{{ order.user.username }}</td>
+                <td style="padding: 1rem;">
+                    {{ order.package.name }}<br>
+                    <small style="color: var(--text-muted);">Venue: {% if order.venue %}{{ order.venue.name }}{% else %}-{% endif %}</small>
+                </td>
+                <td style="padding: 1rem;">{{ order.event_date }}</td>
+                <td style="padding: 1rem;">{{ order.get_theme_type_display }}</td>
+                <td style="padding: 1rem;">
+                    <span style="font-weight: 500;
+                        {% if order.status == 'COMPLETED' %}color: var(--success);
+                        {% elif order.status == 'PENDING' %}color: #e3b341;
+                        {% elif order.status == 'CANCELLED' %}color: var(--danger);
+                        {% endif %}">
+                        {{ order.get_status_display }}
+                    </span>
+                </td>
+                <td style="padding: 1rem;">
+                    {% if order.payment %}
+                        {{ order.payment.get_status_display }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="{% url 'adminOrderDetail' order.id %}" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
-{% else %}
-    <p>No orders found.</p>
-{% endif %}
-
-<p><a href="{% url 'adminDashboard' %}">Back to Dashboard</a></p>
+    {% else %}
+    <div style="text-align: center; padding: 2rem;">
+        <p>No orders found.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

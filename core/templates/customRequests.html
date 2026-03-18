@@ -1,23 +1,48 @@
-<h2>My Custom Package Requests</h2>
+{% extends 'base.html' %}
 
-{% if requests %}
-    <table border="1">
-        <tr>
-            <th>Title</th>
-            <th>Category</th>
-            <th>Description</th>
-            <th>Status</th>
-        </tr>
+{% block title %}My Custom Package Requests - Evoque{% endblock %}
 
-        {% for r in requests %}
-        <tr>
-            <td>{{ r.title }}</td>
-            <td>{{ r.category.name }}</td>
-            <td>{{ r.description }}</td>
-            <td>{{ r.status }}</td>
-        </tr>
-        {% endfor %}
+{% block content %}
+<div class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="margin: 0;">My Custom Package Requests</h2>
+    <a href="{% url 'customerDashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+
+<div class="glass-panel" style="overflow-x: auto;">
+    {% if requests %}
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+            <tr style="border-bottom: 1px solid var(--glass-border);">
+                <th style="padding: 1rem; color: var(--primary-accent);">Title</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Category</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Description</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in requests %}
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s;">
+                <td style="padding: 1rem;"><strong>{{ r.title }}</strong></td>
+                <td style="padding: 1rem;">{{ r.category.name }}</td>
+                <td style="padding: 1rem;">{{ r.description }}</td>
+                <td style="padding: 1rem;">
+                    <span style="font-weight: 500; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem;
+                        {% if r.status == 'APPROVED' %}background: rgba(46,160,67,0.2); color: #3fb950;
+                        {% elif r.status == 'PENDING' %}background: rgba(210,153,34,0.2); color: #e3b341;
+                        {% elif r.status == 'REJECTED' %}background: rgba(248,81,73,0.2); color: #ff7b72;
+                        {% endif %}">
+                        {{ r.status }}
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
-{% else %}
-    <p>No custom package requests yet.</p>
-{% endif %}
+    {% else %}
+    <div style="text-align: center; padding: 2rem;">
+        <p style="margin-bottom: 1.5rem;">No custom package requests yet.</p>
+        <a href="{% url 'customPackage' %}" class="btn btn-primary">Request Custom Package</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,40 +1,75 @@
-<h2>Custom Request Detail</h2>
+{% extends 'base.html' %}
 
-<p><strong>Customer:</strong> {{ request_obj.customer.username }}</p>
-<p><strong>Title:</strong> {{ request_obj.title }}</p>
-<p><strong>Category:</strong> {{ request_obj.category.name }}</p>
-<p><strong>Description:</strong> {{ request_obj.description }}</p>
-<p><strong>Expected Budget:</strong> ₹{{ request_obj.expectedBudget }}</p>
-<p><strong>Status:</strong> {{ request_obj.status }}</p>
-<p><strong>Created:</strong> {{ request_obj.createdAt }}</p>
+{% block title %}Custom Request Detail - Evoque Admin{% endblock %}
 
-<hr>
+{% block content %}
+<div class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="margin: 0;">Custom Request Detail</h2>
+    <a href="{% url 'adminCustomRequests' %}" class="btn btn-secondary">Back to Requests</a>
+</div>
 
-<h3>Update Status</h3>
-<form method="post">
-    {% csrf_token %}
-    <button type="submit" name="action" value="approve">Approve</button>
-    <button type="submit" name="action" value="reject">Reject</button>
-</form>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <!-- Request Details -->
+    <div class="glass-panel" style="padding: 1.5rem;">
+        <h3 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; margin-bottom: 1rem;">Request Information</h3>
+        <p><strong>Customer:</strong> {{ request_obj.customer.username }}</p>
+        <p><strong>Title:</strong> <span style="color: var(--primary-accent);">{{ request_obj.title }}</span></p>
+        <p><strong>Category:</strong> {{ request_obj.category.name }}</p>
+        <p><strong>Expected Budget:</strong> ₹{{ request_obj.expectedBudget }}</p>
+        <p><strong>Created:</strong> {{ request_obj.createdAt }}</p>
+        <div style="margin-top: 1rem; border-top: 1px solid var(--glass-border); padding-top: 1rem;">
+            <p><strong>Description:</strong></p>
+            <p style="color: var(--text-color); background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">{{ request_obj.description }}</p>
+        </div>
+        
+        <div style="margin-top: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-weight: 600; font-size: 1.1rem;
+                {% if request_obj.status == 'APPROVED' %}color: var(--success);
+                {% elif request_obj.status == 'PENDING' %}color: #e3b341;
+                {% elif request_obj.status == 'REJECTED' %}color: var(--danger);
+                {% endif %}">
+                Status: {{ request_obj.status }}
+            </span>
+            
+            {% if request_obj.status == 'PENDING' %}
+            <form method="post" style="margin: 0; display: flex; gap: 0.5rem;">
+                {% csrf_token %}
+                <button type="submit" name="action" value="approve" class="btn btn-primary" style="background: var(--success); box-shadow: 0 4px 14px rgba(46,160,67,0.4);">Approve</button>
+                <button type="submit" name="action" value="reject" class="btn btn-secondary" style="color: var(--danger); border-color: rgba(248,81,73,0.3);">Reject</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
 
-<hr>
-
-<h3>Convert to Package</h3>
-<form method="post">
-    {% csrf_token %}
-    <input type="hidden" name="action" value="create_package">
-    <input type="text" name="name" placeholder="Package name" required>
-    <br>
-    <textarea name="description" placeholder="Description (optional)"></textarea>
-    <br>
-    <input type="number" name="price" step="0.01" min="0" placeholder="Package price" required>
-    <br>
-    <label>
-        <input type="checkbox" name="status" checked>
-        Active
-    </label>
-    <br>
-    <button type="submit">Create Package</button>
-</form>
-
-<p><a href="{% url 'adminCustomRequests' %}">Back to Requests</a></p>
+    <!-- Convert to Package -->
+    <div class="glass-panel" style="padding: 1.5rem;">
+        <h3 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; margin-bottom: 1rem;">Convert to Package</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create_package">
+            
+            <div class="form-group">
+                <label>Package Name</label>
+                <input type="text" name="name" placeholder="Package name" value="{{ request_obj.title }} Package" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" placeholder="Description (optional)" rows="3">{{ request_obj.description }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Package Price (₹)</label>
+                <input type="number" name="price" step="0.01" min="0" placeholder="0.00" value="{{ request_obj.expectedBudget }}" required>
+            </div>
+            
+            <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" name="status" id="status" checked style="width: auto;">
+                <label for="status" style="margin: 0;">Active</label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Create Package</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

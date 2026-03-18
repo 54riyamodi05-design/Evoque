@@ -1,28 +1,51 @@
-<h2>Edit Package</h2>
+{% extends 'base.html' %}
 
-<form method="post">
-    {% csrf_token %}
-    <input type="text" name="name" value="{{ package.name }}" required>
-    <br>
-    <textarea name="description">{{ package.description }}</textarea>
-    <br>
-    <label>Category:</label>
-    <select name="category_id" required>
-        {% for category in categories %}
-            <option value="{{ category.id }}" {% if category.id == package.category_id %}selected{% endif %}>
-                {{ category.name }}
-            </option>
-        {% endfor %}
-    </select>
-    <br>
-    <input type="number" name="price" step="0.01" min="0" value="{{ package.price }}" required>
-    <br>
-    <label>
-        <input type="checkbox" name="status" {% if package.status %}checked{% endif %}>
-        Active
-    </label>
-    <br>
-    <button type="submit">Save</button>
-</form>
+{% block title %}Edit Package - Evoque Admin{% endblock %}
 
-<p><a href="{% url 'adminPackages' %}">Back to Packages</a></p>
+{% block content %}
+<div class="center-flex">
+    <div class="glass-panel" style="width: 100%; max-width: 500px;">
+        <h2 style="margin-bottom: 2rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">Edit Package</h2>
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>Package Name</label>
+                <input type="text" name="name" value="{{ package.name }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" rows="4">{{ package.description|default_if_none:"" }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Category</label>
+                <select name="category_id" required>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if category.id == package.category_id %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Base Price (₹)</label>
+                <input type="number" name="price" step="0.01" min="0" value="{{ package.price }}" required>
+            </div>
+
+            <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" name="status" id="status" {% if package.status %}checked{% endif %} style="width: auto;">
+                <label for="status" style="margin: 0;">Active Package</label>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">Save Changes</button>
+                <a href="{% url 'adminPackages' %}" class="btn btn-secondary" style="flex: 1; text-align: center;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

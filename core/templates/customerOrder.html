@@ -1,40 +1,60 @@
-<h2>My Orders</h2>
+{% extends 'base.html' %}
 
-{% if orders %}
-    <table border="1">
-        <tr>
-            <th>Package</th>
-            <th>Theme</th>
-            <th>Status</th>
-            <th>Final Price</th>
-            <th>Payment Method</th>
-            <th>Payment Status</th>
-            <th>Details</th>
-            <th>Cancel</th>
-        </tr>
+{% block title %}My Orders - Evoque{% endblock %}
 
-        {% for order in orders %}
-        <tr>
-            <td>{{ order.package.name }}</td>
-            <td>{{ order.theme_type }}</td>
-            <td>{{ order.status }}</td>
-            <td>₹{{ order.payment.amount }}</td>
-            <td>{{ order.payment.payment_method }}</td>
-            <td>{{ order.payment.status }}</td>
-            <td><a href="{% url 'orderDetail' order.id %}">View</a></td>
-            <td>
-                {% if order.status == 'PENDING' %}
-                    <form method="post" action="{% url 'cancelOrder' order.id %}">
-                        {% csrf_token %}
-                        <button type="submit">Cancel</button>
-                    </form>
-                {% else %}
-                    -
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
+{% block content %}
+<div class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="margin: 0;">My Orders</h2>
+    <a href="{% url 'customerDashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+
+<div class="glass-panel" style="overflow-x: auto; padding: 1.5rem;">
+    {% if orders %}
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+            <tr style="border-bottom: 1px solid var(--glass-border);">
+                <th style="padding: 1rem; color: var(--primary-accent);">Package</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Date</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Theme</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Status</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Total</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s;">
+                <td style="padding: 1rem;">{{ order.package.name }}</td>
+                <td style="padding: 1rem;">{{ order.event_date }}</td>
+                <td style="padding: 1rem;">{{ order.theme_type }}</td>
+                <td style="padding: 1rem;">
+                    <span style="font-weight: 500;
+                        {% if order.status == 'COMPLETED' %}color: var(--success);
+                        {% elif order.status == 'PENDING' %}color: #e3b341;
+                        {% elif order.status == 'CANCELLED' %}color: var(--danger);
+                        {% endif %}">
+                        {{ order.status }}
+                    </span>
+                </td>
+                <td style="padding: 1rem;">₹{{ order.payment.amount }}</td>
+                <td style="padding: 1rem; display: flex; gap: 0.5rem;">
+                    <a href="{% url 'orderDetail' order.id %}" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">View</a>
+                    {% if order.status == 'PENDING' %}
+                        <form method="post" action="{% url 'cancelOrder' order.id %}" style="margin: 0;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; color: var(--danger); border-color: rgba(248,81,73,0.3);">Cancel</button>
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
-{% else %}
-    <p>No orders placed yet.</p>
-{% endif %}
+    {% else %}
+    <div style="text-align: center; padding: 3rem 1rem;">
+        <p style="margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-color);">No orders placed yet.</p>
+        <a href="{% url 'categoryList' %}" class="btn btn-primary">Browse Packages</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

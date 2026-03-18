@@ -1,47 +1,62 @@
-<h2>Service Providers</h2>
+{% extends 'base.html' %}
 
-{% if providers %}
-    <table border="1">
-        <tr>
-            <th>Name</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
+{% block title %}Service Providers - Evoque Admin{% endblock %}
 
-        {% for provider in providers %}
-        <tr>
-            <td>{{ provider.user.get_full_name|default:provider.user.username }}</td>
-            <td>{{ provider.user.username }}</td>
-            <td>{{ provider.user.email }}</td>
-            <td>{{ provider.phone }}</td>
-            <td>
-                {% if provider.status %}
-                    Approved
-                {% else %}
-                    Pending / Blocked
-                {% endif %}
-            </td>
-            <td>
-                {% if provider.status %}
-                    <form method="post" action="{% url 'deactivateProvider' provider.id %}">
-                        {% csrf_token %}
-                        <button type="submit">Deactivate</button>
-                    </form>
-                {% else %}
-                    <form method="post" action="{% url 'approveProvider' provider.id %}">
-                        {% csrf_token %}
-                        <button type="submit">Approve</button>
-                    </form>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
+{% block content %}
+<div class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="margin: 0;">Service Providers</h2>
+    <a href="{% url 'adminDashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+
+<div class="glass-panel" style="overflow-x: auto;">
+    {% if providers %}
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+            <tr style="border-bottom: 1px solid var(--glass-border);">
+                <th style="padding: 1rem; color: var(--primary-accent);">Name</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Username</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Email</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Phone</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Status</th>
+                <th style="padding: 1rem; color: var(--primary-accent);">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for provider in providers %}
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s;">
+                <td style="padding: 1rem;"><strong>{{ provider.user.get_full_name|default:provider.user.username }}</strong></td>
+                <td style="padding: 1rem;">{{ provider.user.username }}</td>
+                <td style="padding: 1rem;">{{ provider.user.email }}</td>
+                <td style="padding: 1rem;">{{ provider.phone }}</td>
+                <td style="padding: 1rem;">
+                    <span style="padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem; 
+                        {% if provider.status %}background: rgba(46,160,67,0.2); color: #3fb950;
+                        {% else %}background: rgba(248,81,73,0.2); color: #ff7b72;
+                        {% endif %}">
+                        {% if provider.status %}Approved{% else %}Pending / Blocked{% endif %}
+                    </span>
+                </td>
+                <td style="padding: 1rem;">
+                    {% if provider.status %}
+                        <form method="post" action="{% url 'deactivateProvider' provider.id %}" style="margin: 0;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; color: #e3b341; border-color: rgba(210,153,34,0.3);">Deactivate</button>
+                        </form>
+                    {% else %}
+                        <form method="post" action="{% url 'approveProvider' provider.id %}" style="margin: 0;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; color: #3fb950; border-color: rgba(46,160,67,0.3);">Approve</button>
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
-{% else %}
-    <p>No service providers found.</p>
-{% endif %}
-
-<p><a href="{% url 'adminDashboard' %}">Back to Dashboard</a></p>
+    {% else %}
+    <div style="text-align: center; padding: 2rem;">
+        <p>No service providers found.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

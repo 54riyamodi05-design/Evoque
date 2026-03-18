@@ -5,6 +5,8 @@ from .models import *
 from django.contrib import messages
 from django.contrib.auth.models import User
 from decimal import Decimal
+from datetime import date
+from django.utils import timezone
 
 def loginView(request):
     if request.method == "POST":
@@ -163,27 +165,73 @@ def packageDetail(request, packageId):
     package=Package.objects.get(id=packageId)
     venues=Venue.objects.filter(status=True)
     
-    return render(request, 'packageDetail.html', {'package':package, 'venues':venues})
+    return render(
+        request,
+        'packageDetail.html',
+        {
+            'package': package,
+            'venues': venues,
+            'today_iso': timezone.localdate().isoformat(),
+        }
+    )
 
+@login_required
 def createOrder(request, packageId):
-    if request.method == 'POST':
-        theme = request.POST['theme_type']
-        venue_id = request.POST['venue_id']
+    if request.method != 'POST':
+        return redirect('packageDetail', packageId=packageId)
 
-        order = Order.objects.create(
-            user=request.user,
-            package_id=packageId,
-            venue_id=venue_id,
-            theme_type=theme
+    theme = request.POST.get('theme_type')
+    venue_id = request.POST.get('venue_id')
+    event_date_raw = request.POST.get('event_date', '').strip()
+
+    if not venue_id:
+        messages.error(request, 'Please select a venue.')
+        return redirect('packageDetail', packageId=packageId)
+
+    if theme not in dict(Order.THEME_CHOICES):
+        messages.error(request, 'Please select a valid theme.')
+        return redirect('packageDetail', packageId=packageId)
+
+    if not event_date_raw:
+        messages.error(request, 'Please select an event date.')
+        return redirect('packageDetail', packageId=packageId)
+
+    try:
+        event_date = date.fromisoformat(event_date_raw)
+    except ValueError:
+        messages.error(request, 'Invalid event date.')
+        return redirect('packageDetail', packageId=packageId)
+
+    if event_date < timezone.localdate():
+        messages.error(request, 'Past event dates are not allowed.')
+        return redirect('packageDetail', packageId=packageId)
+
+    package = get_object_or_404(Package.objects.select_related('category'), id=packageId, status=True)
+    venue = get_object_or_404(Venue, id=venue_id, status=True)
+
+    order = Order.objects.create(
+        user=request.user,
+        package=package,
+        venue=venue,
+        theme_type=theme,
+        event_date=event_date,
+    )
+
+    Payment.objects.create(
+        order=order,
+        amount=order.get_final_price() + venue.price,
+        payment_method='COD'
+    )
+
+    if order.seasonal_discount_percent > Decimal('0.00'):
+        messages.success(
+            request,
+            f'{order.seasonal_discount_percent}% seasonal discount applied for this wedding booking.'
         )
+    else:
+        messages.success(request, 'Order placed successfully.')
 
-        Payment.objects.create(
-            order=order,
-            amount=order.get_final_price() + order.venue.price,
-            payment_method='COD'
-        )
-
-        return redirect('customerDashboard')
+    return redirect('customerDashboard')
 
 
 from django.contrib.auth.decorators import login_required
@@ -703,4 +751,3 @@ def providerTaskUpdate(request, taskId):
             task.save(update_fields=['status'])
 
     return redirect('providerTasks')
-

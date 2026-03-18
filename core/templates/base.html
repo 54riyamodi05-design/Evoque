@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Evoque{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">Evoque</a>
+        <div class="nav-links">
+            {% if request.user.is_authenticated %}
+                <span style="color: var(--text-muted); margin-right: 1rem;">Hello, {{ request.user.username }}</span>
+                
+                {% if request.user.is_superuser %}
+                    <a href="{% url 'adminDashboard' %}">Admin Dashboard</a>
+                {% elif request.user.userprofile.role == 'CUSTOMER' %}
+                    <a href="{% url 'customerDashboard' %}">Dashboard</a>
+                {% elif request.user.userprofile.role == 'PROVIDER' %}
+                    <a href="{% url 'providerDashboard' %}">Dashboard</a>
+                {% endif %}
+                
+                <a href="{% url 'logout' %}" class="btn btn-secondary" style="padding: 0.5rem 1rem;">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'customerRegister' %}" class="btn btn-primary" style="padding: 0.5rem 1rem;">Sign Up</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+</body>
+</html>

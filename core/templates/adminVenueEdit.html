@@ -1,28 +1,54 @@
-<h2>Edit Venue</h2>
+{% extends 'base.html' %}
 
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <input type="text" name="name" value="{{ venue.name }}" required>
-    <br>
-    <textarea name="address" required>{{ venue.address }}</textarea>
-    <br>
-    <input type="number" name="capacity" min="1" value="{{ venue.capacity }}" required>
-    <br>
-    <input type="number" name="price" step="0.01" min="0" value="{{ venue.price }}" required>
-    <br>
-    <input type="file" name="image">
+{% block title %}Edit Venue - Evoque Admin{% endblock %}
 
-     {% if venue.image %}
-        <p>Current Image:</p>
-        <img src="{{ venue.image.url }}" width="200">
-    {% endif %}
+{% block content %}
+<div class="center-flex">
+    <div class="glass-panel" style="width: 100%; max-width: 500px;">
+        <h2 style="margin-bottom: 2rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">Edit Venue</h2>
 
-    <label>
-        <input type="checkbox" name="status" {% if venue.status %}checked{% endif %}>
-        Active
-    </label>
-    <br>
-    <button type="submit">Save</button>
-</form>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>Venue Name</label>
+                <input type="text" name="name" value="{{ venue.name }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Address</label>
+                <textarea name="address" rows="3" required>{{ venue.address }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Capacity</label>
+                <input type="number" name="capacity" min="1" value="{{ venue.capacity }}" required>
+            </div>
 
-<p><a href="{% url 'adminVenues' %}">Back to Venues</a></p>
+            <div class="form-group">
+                <label>Price (₹)</label>
+                <input type="number" name="price" step="0.01" min="0" value="{{ venue.price }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Update Image (Optional)</label>
+                <input type="file" name="image" style="padding: 0.5rem; background: rgba(0,0,0,0.2);">
+                {% if venue.image %}
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Current Image:</p>
+                    <img src="{{ venue.image.url }}" style="width: 100%; height: auto; max-width: 200px; border-radius: 8px; margin-top: 0.5rem;">
+                {% endif %}
+            </div>
+
+            <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" name="status" id="status" {% if venue.status %}checked{% endif %} style="width: auto;">
+                <label for="status" style="margin: 0;">Active Venue</label>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">Save Changes</button>
+                <a href="{% url 'adminVenues' %}" class="btn btn-secondary" style="flex: 1; text-align: center;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,9 +1,28 @@
-<h2>Event Categories</h2>
+{% extends 'base.html' %}
 
-{% for c in categories %}
-    <div>
-        <h3>{{ c.name }}</h3>
-        <p>{{ c.description }}</p>
-        <a href="{% url 'packageList' c.id %}">View Packages</a>
+{% block title %}Event Categories - Evoque{% endblock %}
+
+{% block content %}
+<div class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="margin: 0;">Event Categories</h2>
+    <a href="{% url 'customerDashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+    {% for c in categories %}
+    <div class="glass-panel" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <h3 style="color: var(--primary-accent);">{{ c.name }}</h3>
+            <p>{{ c.description }}</p>
+        </div>
+        <div style="margin-top: 1.5rem;">
+            <a href="{% url 'packageList' c.id %}" class="btn btn-primary btn-block">View Packages</a>
+        </div>
     </div>
-{% endfor %}
+    {% empty %}
+    <div class="glass-panel" style="grid-column: 1 / -1; text-align: center;">
+        <p>No categories available at the moment.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

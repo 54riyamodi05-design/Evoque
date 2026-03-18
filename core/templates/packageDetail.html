@@ -1,35 +1,75 @@
-<h2>{{ package.name }}</h2>
-<p>{{ package.description }}</p>
-<p>Base Price: ₹{{ package.price }}</p>
+{% extends 'base.html' %}
 
-<form method="post" action="{% url 'createOrder' package.id %}">
-    {% csrf_token %}
-    <label>Select Theme:</label>
-    <select name="theme_type">
-        <option value="CLASSIC">Classic</option>
-        <option value="MODERATE">Moderate</option>
-        <option value="SUPREME">Supreme</option>
-    </select>
+{% block title %}{{ package.name }} - Evoque{% endblock %}
 
-    <label>Select Venue:</label>
-    {% for venue in venues %}
-    <div style="border:1px solid #a67474; padding:10px; margin-bottom:15px;">
+{% block content %}
+<div class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="margin: 0;">{{ package.name }}</h2>
+    <a href="{% url 'categoryList' %}" class="btn btn-secondary">Back to Categories</a>
+</div>
 
-        <h4>{{ venue.name }}</h4>
+<div class="glass-panel" style="margin-bottom: 2rem;">
+    <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">{{ package.description }}</p>
+    <p style="font-size: 1.5rem; font-weight: 700; color: var(--success);">Base Price: ₹{{ package.price }}</p>
+</div>
 
-        {% if venue.image %}
-        <img src="{{ venue.image.url }}" width="250">
-        {% else %}
-        <p>No image available</p>
-        {% endif %}
+<div class="glass-panel">
+    <h3 style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">Book this Package</h3>
+    
+    <form method="post" action="{% url 'createOrder' package.id %}">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Select Theme Level:</label>
+            <select name="theme_type" required>
+                <option value="CLASSIC">Classic</option>
+                <option value="MODERATE">Moderate</option>
+                <option value="SUPREME">Supreme</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Select Event Date:</label>
+            <input type="date" name="event_date" min="{{ today_iso }}" required>
+        </div>
 
-        <p>Price: ₹{{ venue.price }}</p>
-        <p>Capacity: {{ venue.capacity }}</p>
+        <h4 style="margin: 2rem 0 1rem;">Select Venue:</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+            {% for venue in venues %}
+            <label class="glass-panel venue-card" style="padding: 1rem; cursor: pointer; display: block; border: 1px solid var(--glass-border); transition: all 0.2s;">
+                <input type="radio" name="venue_id" value="{{ venue.id }}" required style="display: none;">
+                
+                <h4 style="color: var(--primary-accent); margin-bottom: 0.5rem;">{{ venue.name }}</h4>
+                
+                {% if venue.image %}
+                <img src="{{ venue.image.url }}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">
+                {% else %}
+                <div style="width: 100%; height: 160px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; color: var(--text-muted);">
+                    No image available
+                </div>
+                {% endif %}
+                
+                <p style="margin: 0; font-weight: 600;">Price: ₹{{ venue.price }}</p>
+                <p style="margin: 0; font-size: 0.9rem; color: var(--text-muted);">Capacity: {{ venue.capacity }} people</p>
+            </label>
+            {% endfor %}
+        </div>
 
-        <input type="radio" name="venue_id" value="{{ venue.id }}">
-
-    </div>
-    {% endfor %}
-
-    <button type="submit">Book Now</button>
-</form>
+        <button type="submit" class="btn btn-primary btn-block" style="font-size: 1.1rem; padding: 1rem;">Confirm Booking</button>
+    </form>
+</div>
+<script>
+    document.querySelectorAll('input[name="venue_id"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.querySelectorAll('.venue-card').forEach(c => {
+                c.style.borderColor = 'var(--glass-border)';
+                c.style.boxShadow = 'none';
+            });
+            if (this.checked) {
+                this.parentElement.style.borderColor = 'var(--primary-accent)';
+                this.parentElement.style.boxShadow = '0 0 15px rgba(88, 166, 255, 0.3)';
+            }
+        });
+    });
+</script>
+{% endblock %}

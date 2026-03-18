@@ -1,3 +1,13 @@
-<h2>Service Provider Dashboard</h2>
-<a href="{% url 'providerTasks' %}">My Tasks</a><br>
-<a href="{% url 'logout' %}">Logout</a>
+{% extends 'base.html' %}
+
+{% block title %}Service Provider Dashboard - Evoque{% endblock %}
+
+{% block content %}
+<div class="glass-panel">
+    <h2>Service Provider Dashboard</h2>
+    <p>Welcome back! Here you can manage your tasks and services.</p>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem;">
+        <a href="{% url 'providerTasks' %}" class="btn btn-primary">My Tasks</a>
+    </div>
+</div>
+{% endblock %}

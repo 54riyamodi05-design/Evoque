@@ -1,27 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
+{% block title %}Login - Evoque{% endblock %}
 
-<body>
-    <form method="post">
-        {% csrf_token %}
+{% block content %}
+<div class="center-flex">
+    <div class="auth-wrapper glass-panel">
+        <div class="auth-header">
+            <h2>Welcome Back</h2>
+            <p>Please enter your details to sign in.</p>
+        </div>
 
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Login</button>
-        {% if error %}<p>{{ error }}</p>{% endif %}
-    </form>
+        <form method="post">
+            {% csrf_token %}
+            
+            {% if error %}
+            <div class="alert">
+                {{ error }}
+            </div>
+            {% endif %}
 
-    <a href="{% url 'customerRegister' %}">Register as Customer</a><br>
-    <a href="{% url 'providerRegister' %}">Register as Service Provider</a>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="johndoe" required>
+            </div>
 
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
+            </div>
 
+            <button type="submit" class="btn btn-primary btn-block">Log in</button>
+        </form>
 
-</body>
-
-</html>
+        <div class="auth-footer">
+            <p>New to Evoque? <a href="{% url 'customerRegister' %}">Register as Customer</a></p>
+            <p>Want to partner with us? <a href="{% url 'providerRegister' %}">Register as Service Provider</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
